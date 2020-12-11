@@ -1,10 +1,12 @@
-
-
 from datetime import datetime
 
 
 def calculate_risk_profile(data):
-    age, dependents, house, income, marital_status, risk_questions, vehicle = data.values()
+    try:
+        age, dependents, house, income, marital_status, risk_questions, vehicle = data.values()
+    except Exception as err:
+        raise ValueError('Incomplete Input Data')
+
     risk_profile = {
         "auto": 0,
         "disability": 0,
@@ -35,6 +37,8 @@ def calculate_risk_profile(data):
         if house['ownership_status'] == 'mortgaged':
             risk_profile['home'] += 1
             risk_profile['disability'] += 1
+
+        # Life Related Risks
         if dependents > 0:
             risk_profile['life'] += 1
             risk_profile['disability'] += 1
@@ -45,6 +49,7 @@ def calculate_risk_profile(data):
         if vehicle['year'] > datetime.now().year - 5:
             risk_profile['auto'] += 1
 
+        # Calculate the Risk Profile based on scores
         for key, value in risk_profile.items():
             if value <= 0:
                 risk_profile[key] = 'economic'
@@ -64,5 +69,6 @@ def calculate_risk_profile(data):
             risk_profile['home'] = 'ineligible'
 
     except Exception as err:
-        print(err)
+        raise ValueError(err)
+
     return risk_profile
